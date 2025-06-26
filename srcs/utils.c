@@ -12,7 +12,7 @@
 
 #include "../philo.h"
 
-int	ft_isspace(int c)
+int	ft_isspace_alt(int c)
 {
 	if (c == 32 || (c >= 9 && c <= 13))
 		return (1);
@@ -20,16 +20,16 @@ int	ft_isspace(int c)
 		return (0);
 }
 
-int	ft_atoi(const char *str)
+long	ft_check_atol(const char *str)
 {
-	int	i;
-	int	sign;
-	int	num;
+	int		i;
+	int		sign;
+	long	num;
 
 	i = 0;
 	sign = 1;
 	num = 0;
-	while (ft_isspace(str[i]) != 0)
+	while (ft_isspace_alt(str[i]) != 0)
 		i++;
 	if (str[i] == 43 || str[i] == 45)
 	{
@@ -42,5 +42,8 @@ int	ft_atoi(const char *str)
 		num = (num * 10) + (str[i] - '0');
 		i++;
 	}
-	return (sign * num);
+	if (sign == -1 || ((num * sign) > INT_MAX) || ((num * sign) < INT_MIN))
+		return (-1);
+	else
+		return (sign * num);
 }

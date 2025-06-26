@@ -18,27 +18,36 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include <limits.h>
+
+typedef struct s_data t_data;
 
 typedef struct s_philo
 {
-	int id;
-	int meals_eaten;
-	int is_dead;
+	int				id;
+	int				meals_eaten;
+	long			time_since_meal;
+	int				is_dead;
+	int				is_full;
+	pthread_mutex_t *l_fork;
+	pthread_mutex_t *r_fork;
+	t_data			*table;
 }	t_philo;
 
 typedef struct s_data
 {
-	int n_philo;
-	int	die_time;
-	int	eat_time;
-	int sleep_time;
-	int meal_limit;
-	t_philo *philo_arr;
+	long		n_philo;
+	long		die_time;
+	long		eat_time;
+	long		sleep_time;
+	long		meal_limit;
+	t_philo		*philo_arr;
+	pthread_t	*thread_arr;
 }	t_data;
 
 // MAIN.C
 
 // UTILS.C
-int	ft_atoi(const char *str);
+long	ft_check_atol(const char *str);
 
 #endif

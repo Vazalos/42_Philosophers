@@ -13,16 +13,18 @@
 NAME		= philo
 CC			= cc
 RM			= rm -rf
-CC_FLAGS 	= -Wall -Wextra - Werror -g
+CC_FLAGS 	= -Wall -Wextra -Werror -g
+THREAD_FLAG = -pthread
 OBJ_PATH 	= .obj
 OBJ 		= $(addprefix $(OBJ_PATH)/, $(notdir $(SRC:.c=.o)))
 SRC_PATH 	= srcs
-OBJ 		= $(addprefix $(OBJ_PATH)/, main.c)
+SRC 		= $(addprefix $(SRC_PATH)/, main.c \
+										utils.c )
 
 all: $(OBJ_PATH) $(NAME)
 
 $(NAME): $(OBJ)
-	@$(CC) $(CC_FLAGS) $(OBJ) -o $(NAME)
+	@$(CC) $(CC_FLAGS) $(THREAD_FLAG) $(OBJ) -o $(NAME)
 	@echo "[COMPILED]"
 
 $(OBJ_PATH):
@@ -36,7 +38,7 @@ clean:
 	@$(RM) $(OBJ_PATH)
 	@echo "[DELETED OBJECTS]"
 
-fclean:
+fclean: clean
 	@$(RM) $(NAME)
 	@echo "[DELETED EXECUTABLE]"
 
