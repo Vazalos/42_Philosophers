@@ -19,7 +19,8 @@ OBJ_PATH 	= .obj
 OBJ 		= $(addprefix $(OBJ_PATH)/, $(notdir $(SRC:.c=.o)))
 SRC_PATH 	= srcs
 SRC 		= $(addprefix $(SRC_PATH)/, main.c \
-										utils.c )
+										utils.c \
+										inits.c)
 
 all: $(OBJ_PATH) $(NAME)
 

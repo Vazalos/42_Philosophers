@@ -20,19 +20,33 @@
 #include <pthread.h>
 #include <limits.h>
 
+typedef enum e_time_format
+{
+	SECONDS,
+	MILLISECONDS,
+	MICROSECONDS,
+}	t_time_format;
+
 typedef struct s_data t_data;
+typedef pthread_mutex_t mutex;
 
 typedef struct s_philo
 {
-	int				id;
-	int				meals_eaten;
-	long			time_since_meal;
-	int				is_dead;
-	int				is_full;
-	pthread_mutex_t *l_fork;
-	pthread_mutex_t *r_fork;
-	t_data			*table;
+	int			id;
+	int			meals_eaten;
+	long		time_since_meal;
+	int			is_dead;
+	int			is_full;
+	mutex		*l_fork;
+	mutex		*r_fork;
+	t_data		*table;
 }	t_philo;
+
+typedef struct s_fork
+{
+	int			id;
+	mutex		fork;
+}	t_fork;
 
 typedef struct s_data
 {
@@ -43,9 +57,19 @@ typedef struct s_data
 	long		meal_limit;
 	t_philo		*philo_arr;
 	pthread_t	*thread_arr;
+	t_fork		*fork_arr;
+	mutex		is_ready;
 }	t_data;
 
 // MAIN.C
+int		main(int argc, char **argv);
+void*	ft_routine(void* arg);
+
+// INITS.C
+int		ft_parse_args(t_data *table, int argc, char** argv);
+int		ft_init_philos(t_data *table);
+int		ft_init_forks(t_data *table);
+int		ft_init_threads(t_data *table);
 
 // UTILS.C
 long	ft_check_atol(const char *str);
