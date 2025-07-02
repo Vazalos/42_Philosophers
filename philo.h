@@ -59,16 +59,20 @@ typedef struct s_data
 	pthread_t	*thread_arr;
 	t_fork		*fork_arr;
 	mutex		is_ready;
+	size_t		start_time;
 }	t_data;
 
 // MAIN.C
 int		main(int argc, char **argv);
 void*	ft_routine(void* arg);
+size_t	ft_get_time(t_time_format format);
+void	ft_error_message(int error);
 
 // INITS.C
 int		ft_parse_args(t_data *table, int argc, char** argv);
-int		ft_init_philos(t_data *table);
-int		ft_init_forks(t_data *table);
+int		ft_init_data(t_data *table);
+int		ft_alloc_arr(t_data *table);
+void	ft_init_philos(t_data *table);
 int		ft_init_threads(t_data *table);
 
 // UTILS.C

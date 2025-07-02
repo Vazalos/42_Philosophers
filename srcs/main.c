@@ -38,10 +38,20 @@ size_t	ft_get_time(t_time_format format)
 void*	ft_routine(void* arg)
 {
 	t_philo	*philo;
-	int i;
+	int		*ret_val;
+
+	ret_val = malloc(sizeof(int));
 	philo = (t_philo *)arg;
-	i = 0;
-	return(NULL);
+	if (pthread_mutex_lock(philo->r_fork) != 0)
+		return (*ret_val = 1, ret_val);
+	if (pthread_mutex_lock(philo->l_fork) != 0)
+		return (*ret_val = 1, ret_val);
+
+	if (pthread_mutex_unlock(philo->r_fork) != 0)
+		return (*ret_val = 2, ret_val);
+	if (pthread_mutex_unlock(philo->l_fork) != 0)
+		return (*ret_val = 2, ret_val);
+	return (*ret_val = 0, ret_val);
 }
 
 int	main(int argc, char **argv)
@@ -49,8 +59,21 @@ int	main(int argc, char **argv)
 	t_data table;
 
 	if (ft_parse_args(&table, argc, argv) != 0)
-		return(1);
-	ft_init_forks(&table);
-	ft_init_philos(&table);
-	ft_init_threads(&table);
+		return(ft_error_message(1), 1);	
+	if (ft_init_data(&table) != 0)
+		return(ft_error_message(2), 2);
 }
+
+void	ft_error_message(int error)
+{
+	if (error == 0)
+		printf("Argument error. For proper usage provide:\n \
+			1 - number_of_philosophers (0 - 200)\n2 - time_to_die (>60ms)\n \
+			3 - time_to_eat (>60ms)\n4 - time_to_sleep (>60ms)\n \
+			5 - max_number_of_meals (optional)\n");
+	else if (error == 1)
+		printf("Init error\n");
+	else if (error == 2)
+		printf("undef\n");
+}
+
