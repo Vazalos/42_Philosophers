@@ -11,8 +11,6 @@
 /* ************************************************************************** */
 
 #include "../philo.h"
-#include <pthread.h>
-#include <stdio.h>
 
 int ft_parse_args(t_data *table, int argc, char** argv)
 {
@@ -33,7 +31,7 @@ int ft_parse_args(t_data *table, int argc, char** argv)
 		|| table->eat_time < (60 * 1e3)
 		|| table->sleep_time < (60 * 1e3)
 		|| table->n_philo <= 0 || table->n_philo > 200
-		|| (argv[5] && table->meal_limit <= 0))
+		|| (argv[5] && table->meal_limit < 0)) // SHOULD THIS BE POSSIBLY 0?
 		return (1);
 	return (0);
 }
@@ -86,7 +84,6 @@ void	ft_init_philos(t_data *table)
 		table->philo_arr[i].id = i + 1;
 		table->philo_arr[i].meals_eaten = 0;
 		table->philo_arr[i].time_since_meal = 0;
-		table->philo_arr[i].is_dead = 0;
 		table->philo_arr[i].is_full = 0;
 		table->philo_arr[i].table = table;
 		table->philo_arr[i].r_fork = &(table->fork_arr[i].fork);
@@ -102,6 +99,7 @@ int	ft_init_threads(t_data *table)
 	int			i;
 
 	i = -1;
+	table->start_time = ft_get_time(MILLISECONDS); // is this where I position this?
 	if (pthread_mutex_lock(&table->is_ready) != 0)
 		return (1);
 	while (++i < table->n_philo)
@@ -109,9 +107,6 @@ int	ft_init_threads(t_data *table)
 			return (2);
 	if (pthread_mutex_unlock(&table->is_ready) != 0)
 		return (3);
-	if (pthread_mutex_destroy(&table->is_ready) != 0)
-		return (4);
-	table->start_time = ft_get_time(MILLISECONDS);
 	i = -1;
 	while (++i < table->n_philo)
 		if (pthread_join(table->thread_arr[i], NULL) != 0)

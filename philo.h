@@ -27,6 +27,15 @@ typedef enum e_time_format
 	MICROSECONDS,
 }	t_time_format;
 
+typedef enum e_event
+{
+	FORK,
+	EAT,
+	SLEEP,
+	THINK,
+	DIE,
+}	t_event;
+
 typedef struct s_data t_data;
 typedef pthread_mutex_t mutex;
 
@@ -35,7 +44,6 @@ typedef struct s_philo
 	int			id;
 	int			meals_eaten;
 	long		time_since_meal;
-	int			is_dead;
 	int			is_full;
 	mutex		*l_fork;
 	mutex		*r_fork;
@@ -55,18 +63,20 @@ typedef struct s_data
 	long		eat_time;
 	long		sleep_time;
 	long		meal_limit;
+	size_t		start_time;
 	t_philo		*philo_arr;
 	pthread_t	*thread_arr;
 	t_fork		*fork_arr;
 	mutex		is_ready;
-	size_t		start_time;
+	int			dead_philo;
 }	t_data;
 
 // MAIN.C
 int		main(int argc, char **argv);
-void*	ft_routine(void* arg);
 size_t	ft_get_time(t_time_format format);
+void	ft_usleep(size_t wait_time);
 void	ft_error_message(int error);
+int		ft_destroy_mutexes(t_data *table);
 
 // INITS.C
 int		ft_parse_args(t_data *table, int argc, char** argv);
@@ -74,6 +84,13 @@ int		ft_init_data(t_data *table);
 int		ft_alloc_arr(t_data *table);
 void	ft_init_philos(t_data *table);
 int		ft_init_threads(t_data *table);
+
+// ROUTINE.C
+void*	ft_routine(void* arg);
+void	ft_print_message(t_event event, t_philo* philo);
+int		ft_eat(t_philo *philo);
+void	ft_sleep(t_philo *philo);
+void	ft_think(t_philo *philo);
 
 // UTILS.C
 long	ft_check_atol(const char *str);

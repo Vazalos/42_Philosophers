@@ -13,11 +13,20 @@
 #include "../philo.h"
 #include <pthread.h>
 #include <sys/time.h>
+#include <unistd.h>
 
-	//pthread_mutex_init(&table.mutex, NULL); //MUTEX INIT
-	//pthread_mutex_destroy(&table.mutex);
-	//pthread_mutex_lock(&table->mutex);
-	//pthread_mutex_unlock(&table->mutex);
+int	main(int argc, char **argv)
+{
+	t_data table;
+
+	if (ft_parse_args(&table, argc, argv) != 0)
+		return(ft_error_message(1), 1);	
+	if (ft_init_data(&table) != 0)
+		return(ft_error_message(2), 2);
+	if (ft_destroy_mutexes(&table))
+		return(ft_error_message(3), 3);
+	return(0);
+}
 
 size_t	ft_get_time(t_time_format format)
 {
@@ -35,45 +44,42 @@ size_t	ft_get_time(t_time_format format)
 		return (0);
 }
 
-void*	ft_routine(void* arg)
+void	ft_usleep(size_t wait_time)
 {
-	t_philo	*philo;
-	int		*ret_val;
-
-	ret_val = malloc(sizeof(int));
-	philo = (t_philo *)arg;
-	if (pthread_mutex_lock(philo->r_fork) != 0)
-		return (*ret_val = 1, ret_val);
-	if (pthread_mutex_lock(philo->l_fork) != 0)
-		return (*ret_val = 1, ret_val);
-
-	if (pthread_mutex_unlock(philo->r_fork) != 0)
-		return (*ret_val = 2, ret_val);
-	if (pthread_mutex_unlock(philo->l_fork) != 0)
-		return (*ret_val = 2, ret_val);
-	return (*ret_val = 0, ret_val);
+	size_t	start;
+	
+	start = ft_get_time(MILLISECONDS);
+	while ((ft_get_time(MILLISECONDS) - start) < wait_time)
+		usleep(50);
 }
 
-int	main(int argc, char **argv)
+int	ft_destroy_mutexes(t_data *table)
 {
-	t_data table;
+	int	i;
 
-	if (ft_parse_args(&table, argc, argv) != 0)
-		return(ft_error_message(1), 1);	
-	if (ft_init_data(&table) != 0)
-		return(ft_error_message(2), 2);
+	i = -1;
+	if(pthread_mutex_destroy(&(table->is_ready)) != 0)
+		return (2);
+	while (++i < table->n_philo)
+	{
+		if(pthread_mutex_destroy(&(table->fork_arr[i].fork)) != 0)
+			return (1);
+	}
+	return(0);
 }
 
 void	ft_error_message(int error)
 {
-	if (error == 0)
-		printf("Argument error. For proper usage provide:\n \
-			1 - number_of_philosophers (0 - 200)\n2 - time_to_die (>60ms)\n \
-			3 - time_to_eat (>60ms)\n4 - time_to_sleep (>60ms)\n \
-			5 - max_number_of_meals (optional)\n");
-	else if (error == 1)
-		printf("Init error\n");
+	if (error == 1)
+		printf("Argument error. For proper usage provide:\n"
+			"	1. number_of_philosophers (0 - 200)\n"
+			"	2. time_to_die (>60ms)\n"
+			"	3. time_to_eat (>60ms)\n"
+			"	4. time_to_sleep (>60ms)\n"
+			"	5. max_number_of_meals (optional, >=0)\n");
 	else if (error == 2)
-		printf("undef\n");
+		printf("Init error\n");
+	else if (error == 3)
+		printf("Destroy mutex error\n");
 }
 
