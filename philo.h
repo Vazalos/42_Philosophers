@@ -43,7 +43,7 @@ typedef struct s_philo
 {
 	int			id;
 	int			meals_eaten;
-	long		time_since_meal;
+	size_t		last_meal_time;
 	int			is_full;
 	mutex		*l_fork;
 	mutex		*r_fork;
@@ -58,17 +58,19 @@ typedef struct s_fork
 
 typedef struct s_data
 {
-	long		n_philo;
-	long		die_time;
-	long		eat_time;
-	long		sleep_time;
-	long		meal_limit;
+	int			n_philo;
+	size_t		die_time;
+	size_t		eat_time;
+	size_t		sleep_time;
+	int			meal_limit;
+	int			full_philos;
 	size_t		start_time;
 	t_philo		*philo_arr;
 	pthread_t	*thread_arr;
 	t_fork		*fork_arr;
 	mutex		is_ready;
-	int			dead_philo;
+	int			end_simul;
+	pthread_t	monitor;
 }	t_data;
 
 // MAIN.C
@@ -94,5 +96,9 @@ void	ft_think(t_philo *philo);
 
 // UTILS.C
 long	ft_check_atol(const char *str);
+
+// MONITOR.C
+int		ft_monitor_end_check(t_philo *philo, t_data *table);
+void	*ft_monitor_routine(void *arg);
 
 #endif

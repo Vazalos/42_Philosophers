@@ -21,7 +21,8 @@ SRC_PATH 	= srcs
 SRC 		= $(addprefix $(SRC_PATH)/, main.c \
 										inits.c \
 										routine.c \
-										utils.c)
+										utils.c \
+										monitor.c)
 
 
 all: $(OBJ_PATH) $(NAME)

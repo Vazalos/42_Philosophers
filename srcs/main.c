@@ -34,12 +34,10 @@ size_t	ft_get_time(t_time_format format)
 
 	if (gettimeofday(&time, NULL) != 0)
 		return (0);
-	if (format == SECONDS)
-		return(time.tv_sec + (time.tv_usec / 1000000));
+	if (format == MICROSECONDS)
+		return((time.tv_sec * 1000000) + time.tv_usec);
 	else if (format == MILLISECONDS)
 		return((time.tv_sec * 1000) + (time.tv_usec / 1000));
-	else if (format == MICROSECONDS)
-		return((time.tv_sec * 1000000) + time.tv_usec);
 	else 
 		return (0);
 }
@@ -47,10 +45,10 @@ size_t	ft_get_time(t_time_format format)
 void	ft_usleep(size_t wait_time)
 {
 	size_t	start;
-	
-	start = ft_get_time(MILLISECONDS);
-	while ((ft_get_time(MILLISECONDS) - start) < wait_time)
-		usleep(50);
+
+	start = ft_get_time(MICROSECONDS);
+	while ((ft_get_time(MICROSECONDS) - start) < wait_time)
+		usleep(500);
 }
 
 int	ft_destroy_mutexes(t_data *table)

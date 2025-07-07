@@ -43,7 +43,7 @@ int	ft_init_data(t_data *table)
 	i = -1;
 	if (ft_alloc_arr(table) != 0)
 		return (1);
-	while (++i <= table->n_philo)
+	while (++i < table->n_philo)
 	{
 		if(pthread_mutex_init(&(table->fork_arr[i].fork), NULL) != 0)
 			return (2);
@@ -51,6 +51,8 @@ int	ft_init_data(t_data *table)
 	}
 	if (pthread_mutex_init(&table->is_ready, NULL) != 0)
 		return (3);
+	table->end_simul = 0;
+	table->full_philos = 0;
 	ft_init_philos(table);
 	if (ft_init_threads(table) != 0)
 		return (4);
@@ -79,11 +81,11 @@ void	ft_init_philos(t_data *table)
 	int	i;
 
 	i = -1;
-	while (++i <= table->n_philo)
+	while (++i < table->n_philo)
 	{
 		table->philo_arr[i].id = i + 1;
-		table->philo_arr[i].meals_eaten = 0;
-		table->philo_arr[i].time_since_meal = 0;
+		table->philo_arr[i].meals_eaten = 0;	
+		table->philo_arr[i].last_meal_time = 0;
 		table->philo_arr[i].is_full = 0;
 		table->philo_arr[i].table = table;
 		table->philo_arr[i].r_fork = &(table->fork_arr[i].fork);
@@ -96,20 +98,25 @@ void	ft_init_philos(t_data *table)
 
 int	ft_init_threads(t_data *table)
 {
-	int			i;
+	int	i;
 
 	i = -1;
-	table->start_time = ft_get_time(MILLISECONDS); // is this where I position this?
-	if (pthread_mutex_lock(&table->is_ready) != 0)
+	if (pthread_create(&table->monitor, NULL, &ft_monitor_routine, &table) != 0)
 		return (1);
+	if (pthread_mutex_lock(&table->is_ready) != 0)
+		return (2);
 	while (++i < table->n_philo)
+	{
 		if (pthread_create(&table->thread_arr[i], NULL, &ft_routine, &table->philo_arr[i]) != 0)
-			return (2);
+			return (3);
+		//printf("thread %i is %lu\n", i, (unsigned long)table->thread_arr[i]);
+	}
+	table->start_time = ft_get_time(MILLISECONDS); // is this where I position this?	
 	if (pthread_mutex_unlock(&table->is_ready) != 0)
-		return (3);
+		return (4);
 	i = -1;
 	while (++i < table->n_philo)
 		if (pthread_join(table->thread_arr[i], NULL) != 0)
 			return (5);
-	return (0);
+	return (0);	
 }
