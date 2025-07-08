@@ -17,28 +17,28 @@
 
 int	main(int argc, char **argv)
 {
-	t_data table;
+	t_data	table;
 
 	if (ft_parse_args(&table, argc, argv) != 0)
-		return(ft_error_message(1), 1);	
+		return (ft_error_message(1), 1);
 	if (ft_init_data(&table) != 0)
-		return(ft_error_message(2), 2);
-	if (ft_destroy_mutexes(&table))
-		return(ft_error_message(3), 3);
-	return(0);
+		return (ft_error_message(2), 2);
+	if (ft_free_allocs(&table) != 0)
+		return (ft_error_message(3), 3);
+	return (0);
 }
 
 size_t	ft_get_time(t_time_format format)
 {
-	struct timeval time;
+	struct timeval	time;
 
 	if (gettimeofday(&time, NULL) != 0)
 		return (0);
 	if (format == MICROSECONDS)
-		return((time.tv_sec * 1000000) + time.tv_usec);
+		return ((time.tv_sec * 1000000) + time.tv_usec);
 	else if (format == MILLISECONDS)
-		return((time.tv_sec * 1000) + (time.tv_usec / 1000));
-	else 
+		return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
+	else
 		return (0);
 }
 
@@ -46,24 +46,26 @@ void	ft_usleep(size_t wait_time)
 {
 	size_t	start;
 
-	start = ft_get_time(MICROSECONDS);
-	while ((ft_get_time(MICROSECONDS) - start) < wait_time)
+	start = ft_get_time(MILLISECONDS);
+	while ((ft_get_time(MILLISECONDS) - start) < wait_time)
 		usleep(500);
 }
 
-int	ft_destroy_mutexes(t_data *table)
+int	ft_free_allocs(t_data *table)
 {
 	int	i;
 
 	i = -1;
-	if(pthread_mutex_destroy(&(table->is_ready)) != 0)
+	if (pthread_mutex_destroy(&(table->is_ready)) != 0)
 		return (2);
 	while (++i < table->n_philo)
 	{
-		if(pthread_mutex_destroy(&(table->fork_arr[i].fork)) != 0)
+		if (pthread_mutex_destroy(&(table->fork_arr[i].fork)) != 0)
 			return (1);
 	}
-	return(0);
+	if (table->philo_arr)
+		free(table->philo_arr);
+	return (0);
 }
 
 void	ft_error_message(int error)
@@ -78,6 +80,10 @@ void	ft_error_message(int error)
 	else if (error == 2)
 		printf("Init error\n");
 	else if (error == 3)
-		printf("Destroy mutex error\n");
+		printf("Free error\n");
 }
 
+/*size_t	ft_time_from_start(t_data *table, size_t elapsed)
+{
+	return(table->start_time - elapsed);
+}*/

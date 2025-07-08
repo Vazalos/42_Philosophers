@@ -13,12 +13,12 @@
 #ifndef PHILO_H
 # define PHILO_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <pthread.h>
-#include <limits.h>
+# include <stdlib.h>
+# include <stdio.h>
+# include <unistd.h>
+# include <sys/time.h>
+# include <pthread.h>
+# include <limits.h>
 
 typedef enum e_time_format
 {
@@ -36,8 +36,8 @@ typedef enum e_event
 	DIE,
 }	t_event;
 
-typedef struct s_data t_data;
-typedef pthread_mutex_t mutex;
+typedef struct	s_data t_data;
+typedef			pthread_mutex_t mutex;
 
 typedef struct s_philo
 {
@@ -78,7 +78,7 @@ int		main(int argc, char **argv);
 size_t	ft_get_time(t_time_format format);
 void	ft_usleep(size_t wait_time);
 void	ft_error_message(int error);
-int		ft_destroy_mutexes(t_data *table);
+int		ft_free_allocs(t_data *table);
 
 // INITS.C
 int		ft_parse_args(t_data *table, int argc, char** argv);
@@ -98,7 +98,7 @@ void	ft_think(t_philo *philo);
 long	ft_check_atol(const char *str);
 
 // MONITOR.C
+void	ft_monitor_routine(t_data *table);
 int		ft_monitor_end_check(t_philo *philo, t_data *table);
-void	*ft_monitor_routine(void *arg);
 
 #endif
